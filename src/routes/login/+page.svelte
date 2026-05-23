@@ -4,6 +4,7 @@
 
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
+	import { ulid } from 'ulid';
 
 	const queryParams = page.url.searchParams;
 
@@ -28,6 +29,15 @@
 		}
 	});
 
+	function getFormattedEmail(input: string) {
+		const trimmed = input.trim();
+		if (trimmed.includes('@')) {
+			return trimmed;
+		}
+		// IDの場合はダミードメインを付与してメールアドレス化
+		return `${trimmed.toLowerCase()}@sazanami.local`;
+	}
+
 	async function handleSubmit(event: Event) {
 		event.preventDefault();
 		if (isLoading) return;
@@ -35,11 +45,13 @@
 		error = null;
 		message = null;
 
+		const targetEmail = getFormattedEmail(email);
+
 		try {
 			if (mode === 'login') {
-				console.log('Attempting login with email:', email);
+				console.log('Attempting login with target email:', targetEmail);
 				const { data, error: apiError } = await signIn.email({
-					email,
+					email: targetEmail,
 					password,
 					callbackURL: '/home'
 				});
@@ -54,18 +66,15 @@
 					);
 				} else {
 					console.log('Login successful:', data);
-					// ユーザー名を取得してリダイレクト
 					console.log('Redirecting to home page');
-					// Invalidate all data to ensure fresh data is loaded
 					await invalidateAll();
-					// Redirect to home page
 					await goto('/home');
 				}
 			} else {
-				console.log('Attempting registration with email:', email);
+				console.log('Attempting registration with target email:', targetEmail);
 				const { data: signUpdata, error: signUpError } = await signUp.email({
-					name,
-					email,
+					name: name.trim() || email.trim(),
+					email: targetEmail,
 					password,
 					callbackURL: '/home'
 				});
@@ -75,9 +84,28 @@
 					error = signUpError.message || '登録に失敗しました。';
 				} else {
 					console.log('Registration successful:', signUpdata);
-					message =
-						'確認用メールを送信しました。メールのリンクをクリックし登録を完了してください。';
-					mode = 'login';
+					// ダミードメインの場合はメールが届かないため、自動でログインを試みる
+					if (targetEmail.endsWith('@sazanami.local')) {
+						console.log('Virtual domain registration, attempting auto login...');
+						const { data: signInData, error: signInError } = await signIn.email({
+							email: targetEmail,
+							password,
+							callbackURL: '/home'
+						});
+
+						if (signInError) {
+							console.error('Auto signin error:', signInError);
+							// 自動ログインに失敗した場合はログイン画面に戻す
+							message = '登録が完了しました。作成したIDとパスワードでログインしてください。';
+							mode = 'login';
+						} else {
+							await invalidateAll();
+							await goto('/home');
+						}
+					} else {
+						message = '確認用メールを送信しました。メールのリンクをクリックし登録を完了してください。';
+						mode = 'login';
+					}
 				}
 			}
 		} catch (e: unknown) {
@@ -228,6 +256,56 @@
 			isLoading = false;
 		}
 	};
+
+	const startAsGuest = async () => {
+		if (isLoading) return;
+		isLoading = true;
+		error = null;
+		message = null;
+
+		try {
+			const guestId = 'guest_' + ulid().toLowerCase();
+			const guestPassword = ulid() + ulid(); // 十分に長くユニークなパスワード
+			const guestEmail = `${guestId}@sazanami.local`;
+
+			console.log('Registering guest user:', guestId);
+			const { data: signUpdata, error: signUpError } = await signUp.email({
+				name: `ゲスト (${guestId.slice(6, 12)})`,
+				email: guestEmail,
+				password: guestPassword,
+				callbackURL: '/home'
+			});
+
+			if (signUpError) {
+				console.error('Guest registration error:', signUpError);
+				error = signUpError.message || 'ゲストログインに失敗しました。';
+			} else {
+				console.log('Guest registration successful, signing in...');
+				const { data: signInData, error: signInError } = await signIn.email({
+					email: guestEmail,
+					password: guestPassword,
+					callbackURL: '/home'
+				});
+
+				if (signInError) {
+					console.error('Guest login error:', signInError);
+					error = signInError.message || 'ゲストログインに失敗しました。';
+				} else {
+					await invalidateAll();
+					await goto('/home');
+				}
+			}
+		} catch (e: unknown) {
+			console.error('Guest login unexpected error:', e);
+			if (e instanceof Error) {
+				error = e.message;
+			} else {
+				error = '予期せぬエラーが発生しました。';
+			}
+		} finally {
+			isLoading = false;
+		}
+	};
 </script>
 
 <div class="container" style="max-width: 400px; margin: 2rem auto;">
@@ -292,11 +370,33 @@
 				<div class="card-actions mt-4">
 					<button
 						type="button"
+						class="btn btn-secondary w-full font-bold btn-outline"
+						disabled={isLoading}
+						onclick={startAsGuest}
+					>
+						アカウント不要で始める (ゲスト)
+					</button>
+				</div>
+				
+				<div class="card-actions mt-4">
+					<button
+						type="button"
 						class="btn btn-primary w-full font-bold"
 						disabled={isLoading}
 						onclick={signInWithPasskey}
 					>
 						パスキーでログイン
+					</button>
+				</div>
+			{:else}
+				<div class="card-actions mt-4">
+					<button
+						type="button"
+						class="btn btn-secondary w-full font-bold btn-outline"
+						disabled={isLoading}
+						onclick={startAsGuest}
+					>
+						アカウント不要で始める (ゲスト)
 					</button>
 				</div>
 			{/if}
@@ -326,11 +426,11 @@
 			<div class="card-actions mt-4">
 				<button
 					type="button"
-					class="btn w-full font-bold"
+					class="btn w-full font-bold btn-neutral"
 					disabled={isLoading}
 					onclick={() => (showPasswordModal = true)}
 				>
-					{mode === 'login' ? 'パスワードでログイン' : 'パスワードで登録'}
+					{mode === 'login' ? 'IDとパスワードでログイン' : 'IDとパスワードで登録'}
 				</button>
 			</div>
 		</div>
@@ -347,7 +447,7 @@
 				>
 			</form>
 			<h3 class="mb-4 text-lg font-bold">
-				{mode === 'login' ? 'パスワードでログイン' : 'パスワードで登録'}
+				{mode === 'login' ? 'IDとパスワードでログイン' : 'IDとパスワードで登録'}
 			</h3>
 			{#if error}
 				<div role="alert" class="alert alert-error mb-4">
@@ -386,25 +486,26 @@
 			<form onsubmit={handleSubmit}>
 				{#if mode === 'register'}
 					<div class="form-control mb-4">
-						<label class="label" for="name"><span class="label-text">Name</span></label>
+						<label class="label" for="name"><span class="label-text">表示名（省略時はIDと同じ）</span></label>
 						<input
 							id="name"
 							name="name"
 							type="text"
 							class="input input-bordered w-full"
+							placeholder="例: たろう"
 							bind:value={name}
-							required
 							disabled={isLoading}
 						/>
 					</div>
 				{/if}
 				<div class="form-control mb-4">
-					<label class="label" for="email"><span class="label-text">Email</span></label>
+					<label class="label" for="email"><span class="label-text">ユーザーID または メールアドレス</span></label>
 					<input
 						id="email"
 						name="email"
-						type="email"
+						type="text"
 						class="input input-bordered w-full"
+						placeholder="ユーザーID または email@example.com"
 						bind:value={email}
 						required
 						disabled={isLoading}
