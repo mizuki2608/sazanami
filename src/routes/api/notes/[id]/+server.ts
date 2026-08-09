@@ -42,7 +42,9 @@ export const GET: RequestHandler = async ({ params, request }) => {
 		if (note[0].contentBin) {
 			try {
 				contentBinBase64 = Buffer.from(note[0].contentBin).toString('base64');
-			} catch (e) {}
+			} catch {
+				// ignore
+			}
 		}
 
 		const noteWithTags = {
@@ -303,7 +305,9 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 		if (updatedNote[0].contentBin) {
 			try {
 				contentBinBase64 = Buffer.from(updatedNote[0].contentBin).toString('base64');
-			} catch (e) {}
+			} catch {
+				// ignore
+			}
 		}
 
 		const noteWithTags = {

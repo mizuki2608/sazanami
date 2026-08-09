@@ -4,13 +4,13 @@
 	import NoteModal from '$lib/components/NoteModal.svelte';
 	import SortSelector from '$lib/components/SortSelector.svelte';
 	import { sortNotes, type SortKey } from '$lib/utils/note-utils';
+	import { SvelteURLSearchParams } from 'svelte/reactivity';
 
 	type SearchPageData = {
 		notes: Note[];
 		q: string;
 		pagination: {
 			page: number;
-			limit: number;
 			total: number;
 			totalPages: number;
 		};
@@ -40,7 +40,7 @@
 	}
 
 	function buildPageLink(nextPage: number) {
-		const params = new URLSearchParams();
+		const params = new SvelteURLSearchParams();
 		if (data.q) {
 			params.set('q', data.q);
 		}

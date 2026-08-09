@@ -195,7 +195,7 @@
 				</button>
 			</div>
 			<ul class="bg-base-200 rounded-box divide-base-300 max-h-48 divide-y overflow-y-auto">
-				{#each selectedFiles as file, i}
+				{#each selectedFiles as file, i (file.name)}
 					<li class="flex items-center gap-2 px-3 py-2 text-sm">
 						<span>{getFileIcon(file)}</span>
 						<span class="min-w-0 flex-1 truncate">{file.name}</span>
@@ -256,7 +256,7 @@
 					<div class="w-full">
 						<p class="text-sm font-medium">一部のファイルのインポートに失敗しました:</p>
 						<ul class="mt-1 list-inside list-disc space-y-0.5 text-xs">
-							{#each result.errors as err}
+							{#each result.errors as err (err)}
 								<li>{err}</li>
 							{/each}
 						</ul>

@@ -140,7 +140,7 @@ export const NoteEmbedNode = Node.create({
 			return src.indexOf('![[');
 		},
 
-		tokenize: (src: string, _tokens: any[], _lexer: any) => {
+		tokenize: (src) => {
 			const match = /^!\[\[(.*?)\]\]/.exec(src);
 			if (!match) return undefined;
 			return {
@@ -151,13 +151,13 @@ export const NoteEmbedNode = Node.create({
 		}
 	},
 
-	parseMarkdown(token: any, helpers: any) {
+	parseMarkdown(token, helpers) {
 		return helpers.createNode('noteEmbed', {
 			title: token.title || ''
 		});
 	},
 
-	renderMarkdown(node: any, _helpers: any, _ctx: any) {
+	renderMarkdown(node) {
 		return `![[${node.attrs?.title || ''}]]\n\n`;
 	}
 });

@@ -53,7 +53,9 @@
 	// contentまたはtitleが変更されたら自動保存をトリガー
 	$effect(() => {
 		// titleとcontentの変更を検知するためにアクセスする
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const _t = title;
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const _c = content;
 
 		if (!noteId || !initialized) return;
@@ -145,10 +147,6 @@
 		processingClose = true;
 
 		try {
-			// Capture the state BEFORE anything else
-			const currentContent = content;
-			const currentTitle = title;
-
 			// ALWAYS attempt a final save if anything has changed and we were initialized
 			// Or just always try to save to be 100% safe
 			if (initialized) {

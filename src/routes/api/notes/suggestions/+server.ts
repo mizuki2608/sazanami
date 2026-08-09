@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { notes } from '$lib/server/db/schema';
-import { eq, and, like, ne, desc } from 'drizzle-orm';
+import { eq, and, like, ne, desc, type SQL } from 'drizzle-orm';
 import { createAuth } from '$lib/server/auth';
 const auth = createAuth();
 
@@ -21,7 +21,7 @@ export const GET: RequestHandler = async ({ url, request }) => {
 	const limit = 10;
 
 	try {
-		const conditions: any[] = [eq(notes.userId, session.session.userId), ne(notes.title, '')];
+		const conditions: SQL[] = [eq(notes.userId, session.session.userId), ne(notes.title, '')];
 
 		if (scope === 'box') {
 			conditions.push(eq(notes.status, 'box'));

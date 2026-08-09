@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { Editor } from '@tiptap/core';
+	import { Editor, type Extensions } from '@tiptap/core';
 	import StarterKit from '@tiptap/starter-kit';
 	import Placeholder from '@tiptap/extension-placeholder';
 	import Link from '@tiptap/extension-link';
@@ -152,17 +152,6 @@
 		}
 	}
 
-	function getWikiLinkQuery(): string | null {
-		if (!editor) return null;
-		const { state } = editor;
-		const { from } = state.selection;
-		// カーソル前のテキストを取得（最大50文字）
-		const textBefore = state.doc.textBetween(Math.max(0, from - 50), from, '\n');
-		// ![[ または [[ で始まりまだ ]] で閉じていない部分を検索
-		const match = textBefore.match(/(!?)\[\[([^\]\n]*)$/);
-		return match ? match[2] : null;
-	}
-
 	function updateSuggestionPosition() {
 		if (!editor) return;
 		// カーソル位置のDOM座標を取得
@@ -176,24 +165,9 @@
 		};
 	}
 
-	function onEditorUpdate() {
-		if (!editable) return;
-		const query = getWikiLinkQuery();
-		if (query !== null) {
-			suggestionQuery = query;
-			updateSuggestionPosition();
-			showSuggestions = true;
-			clearTimeout(debounceTimer);
-			debounceTimer = setTimeout(() => fetchSuggestions(query), 200);
-		} else {
-			showSuggestions = false;
-			suggestions = [];
-		}
-	}
-
 	function selectSuggestion(suggestion: Suggestion) {
 		if (!editor) return;
-		const { state, view } = editor;
+		const { state } = editor;
 		const { from } = state.selection;
 		const textBefore = state.doc.textBetween(Math.max(0, from - 50), from, '\n');
 		const match = textBefore.match(/(!?)\[\[([^\]\n]*)$/);
@@ -288,7 +262,7 @@
 			}
 
 			// Build extensions array (CollaborationCursor is conditional on Hocuspocus)
-			const extensions: any[] = [
+			const extensions: Extensions = [
 				StarterKit.configure({
 					codeBlock: false,
 					link: false,
@@ -443,9 +417,9 @@
 			});
 
 			lastSyncedMarkdown = normalizeMarkdown(editor.getMarkdown());
-		} catch (error: any) {
+		} catch (error) {
 			console.error('Editor init error:', error);
-			alert('エディタの読み込みに失敗しました: ' + error.message);
+			alert('エディタの読み込みに失敗しました: ' + (error as Error).message);
 		}
 	});
 

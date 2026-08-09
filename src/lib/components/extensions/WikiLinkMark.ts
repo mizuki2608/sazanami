@@ -1,7 +1,7 @@
 import { Mark, mergeAttributes } from '@tiptap/core';
 
 export interface WikiLinkOptions {
-	HTMLAttributes: Record<string, any>;
+	HTMLAttributes: Record<string, string>;
 }
 
 export const WikiLinkMark = Mark.create<WikiLinkOptions>({
@@ -47,7 +47,7 @@ export const WikiLinkMark = Mark.create<WikiLinkOptions>({
 			return idx;
 		},
 
-		tokenize: (src: string, _tokens: any[], _lexer: any) => {
+		tokenize: (src) => {
 			// Don't match ![[
 			if (src.startsWith('![[')) return undefined;
 			const match = /^\[\[(.*?)\]\]/.exec(src);
@@ -60,11 +60,11 @@ export const WikiLinkMark = Mark.create<WikiLinkOptions>({
 		}
 	},
 
-	parseMarkdown(token: any, helpers: any) {
+	parseMarkdown(token, helpers) {
 		return helpers.applyMark('wikiLink', [helpers.createTextNode(token.text || '')]);
 	},
 
-	renderMarkdown(node: any, helpers: any, _ctx: any) {
+	renderMarkdown(node, helpers) {
 		return `[[${helpers.renderChildren(node)}]]`;
 	}
 });

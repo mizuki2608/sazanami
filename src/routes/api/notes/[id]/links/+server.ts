@@ -16,7 +16,7 @@ export const GET: RequestHandler = async ({ params, request }) => {
 	const noteId = params.id;
 
 	try {
-		const attachTags = async (noteRecords: any[]) => {
+		const attachTags = async (noteRecords: (typeof notes.$inferSelect)[]) => {
 			if (noteRecords.length === 0) return [];
 			const noteIds = noteRecords.map((r) => r.id);
 			const tagsResult = await db
@@ -68,7 +68,7 @@ export const GET: RequestHandler = async ({ params, request }) => {
 				.where(eq(noteLinks.sourceNoteId, noteId))
 		).map((r) => r.id);
 
-		let twoHopLinksData: any[] = [];
+		let twoHopLinksData: { note: typeof notes.$inferSelect }[] = [];
 		if (oneHopLinkTargetIds.length > 0) {
 			const twoHopTargetNote = alias(notes, 'twoHopTargetNote');
 			twoHopLinksData = await db
@@ -88,7 +88,7 @@ export const GET: RequestHandler = async ({ params, request }) => {
 
 		// Deduplicate 2-hop links
 		const uniqueTwoHopLinks = new Map<string, Note>();
-		twoHopLinksRaw.forEach((link: any) => {
+		twoHopLinksRaw.forEach((link) => {
 			uniqueTwoHopLinks.set(link.slug, link);
 		});
 

@@ -71,7 +71,9 @@
 			<a href="/home/note/{note.id}" class="flex-grow">
 				<h2 class="card-title mb-2 line-clamp-1 text-lg font-bold">{note.title}</h2>
 				<div class="text-base-content/70 mb-3 line-clamp-3 text-sm">
-					{@html sanitizeHtml(
+					<!-- sanitizeHtml()でサニタイズ済みのHTMLのみをレンダリング -->
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+				{@html sanitizeHtml(
 						note.content
 							? note.content.substring(0, 200) + (note.content.length > 200 ? '...' : '')
 							: ''

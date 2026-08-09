@@ -3,9 +3,9 @@
 	import { invalidateAll } from '$app/navigation';
 	import { formatDistanceToNow } from 'date-fns';
 	import { ja } from 'date-fns/locale';
-	import { marked, Marked } from 'marked';
+	import { Marked, type Renderer, type Tokens } from 'marked';
 	import { markedHighlight } from 'marked-highlight';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { createEventDispatcher } from 'svelte';
 	import hljs from 'highlight.js';
 	import { renderWikiLinks } from '$lib/utils/note-utils';
 	import { sanitizeHtml } from '$lib/utils/sanitize';
@@ -27,7 +27,7 @@
 	);
 
 	const renderer = {
-		code(this: any, { text, lang }: { text: string; lang?: string }) {
+		code(this: Renderer, { text, lang }: Tokens.Code) {
 			const language = (lang || '').match(/\S*/)?.[0] || '';
 			const codeStr = text;
 			const langAttr = language ? ` class="hljs language-${language}"` : ' class="hljs"';
@@ -38,7 +38,7 @@
 </div>
 `;
 		},
-		listitem(this: any, token: any) {
+		listitem(this: Renderer, token: Tokens.ListItem) {
 			const { text, task, checked, tokens } = token;
 			if (task) {
 				const checkbox = `<input type="checkbox" ${checked ? 'checked="" ' : ''}style="cursor: pointer; width: 1em; height: 1em; accent-color: var(--color-primary); margin: 0;">`;
@@ -49,11 +49,11 @@
 			const content = tokens && tokens.length > 0 ? customMarked.parser(tokens) : text;
 			return `<li>${content}</li>\n`;
 		},
-		list(this: any, token: any) {
+		list(this: Renderer, token: Tokens.List) {
 			const items = token.items || [];
-			const bodyHtml = items.map((item: any) => this.listitem(item)).join('');
+			const bodyHtml = items.map((item) => this.listitem(item)).join('');
 			const isTaskList =
-				items.some((item: any) => item.task) || (token.raw || '').includes('data-type="taskItem"');
+				items.some((item) => item.task) || (token.raw || '').includes('data-type="taskItem"');
 
 			if (isTaskList) {
 				return `<ul data-type="taskList" class="contains-task-list" style="list-style: none; padding: 0; margin: 0; list-style-type: none !important; padding-left: 0 !important;">\n${bodyHtml}</ul>\n`;
@@ -84,7 +84,7 @@
 	}
 
 	// Action to manually apply enhancements (highlighting, copy buttons, interactive checkboxes)
-	function enhanceProseContent(node: HTMLElement, _contentHtml: string) {
+	function enhanceProseContent(node: HTMLElement, _options?: unknown) {
 		const applyEnhancements = () => {
 			if (!node) return;
 			node.querySelectorAll('pre').forEach((pre) => {
@@ -194,7 +194,7 @@
 			// Markdown approach
 			let matchCount = 0;
 			// Match a markdown list item with checkbox like "- [ ] " or "* [x] "
-			newContent = newContent.replace(/^(\s*[-*+]\s+)\[([ xX])\]/gm, (match, prefix, state) => {
+			newContent = newContent.replace(/^(\s*[-*+]\s+)\[([ xX])\]/gm, (match, prefix) => {
 				if (matchCount === index) {
 					matchCount++;
 					return `${prefix}[${isChecked ? 'x' : ' '}]`;
@@ -405,8 +405,10 @@
 
 		<div class="prose text-base-content max-w-none" use:enhanceProseContent={processedContent}>
 			{#if isHtmlContent}
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 				{@html sanitizeHtml(processedContent || '')}
 			{:else}
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 				{@html sanitizeHtml(customMarked.parse(processedContent || '', { breaks: true }) as string)}
 			{/if}
 		</div>

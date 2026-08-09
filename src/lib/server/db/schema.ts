@@ -8,12 +8,7 @@ import {
 	account,
 	verification,
 	passkey,
-	twoFactor,
-	userRelations,
-	sessionRelations,
-	accountRelations,
-	passkeyRelations,
-	twoFactorRelations
+	twoFactor
 } from './auth-schema';
 // generateSlug のインポートは不要なので削除
 

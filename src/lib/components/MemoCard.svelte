@@ -2,7 +2,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { goto } from '$app/navigation';
 	import type { Note } from '$lib/types';
-	import { Marked } from 'marked';
+	import { Marked, type Renderer, type Tokens } from 'marked';
 	import { markedHighlight } from 'marked-highlight';
 	import hljs from 'highlight.js';
 	import { renderWikiLinks } from '$lib/utils/note-utils';
@@ -29,7 +29,7 @@
 	);
 
 	const renderer = {
-		code(this: any, { text, lang }: { text: string; lang?: string }) {
+		code(this: Renderer, { text, lang }: Tokens.Code) {
 			const language = (lang || '').match(/\S*/)?.[0] || '';
 			const codeStr = text;
 			const langAttr = language ? ` class="hljs language-${language}"` : ' class="hljs"';
@@ -40,7 +40,7 @@
 </div>
 `;
 		},
-		listitem(this: any, token: any) {
+		listitem(this: Renderer, token: Tokens.ListItem) {
 			const { text, task, checked, tokens } = token;
 			if (task) {
 				const checkbox = `<input type="checkbox" ${checked ? 'checked="" ' : ''}style="cursor: pointer; width: 1em; height: 1em; accent-color: var(--color-primary); margin: 0;">`;
@@ -51,11 +51,11 @@
 			const content = tokens && tokens.length > 0 ? customMarked.parser(tokens) : text;
 			return `<li>${content}</li>\n`;
 		},
-		list(this: any, token: any) {
+		list(this: Renderer, token: Tokens.List) {
 			const items = token.items || [];
-			const bodyHtml = items.map((item: any) => this.listitem(item)).join('');
+			const bodyHtml = items.map((item) => this.listitem(item)).join('');
 			const isTaskList =
-				items.some((item: any) => item.task) || (token.raw || '').includes('data-type="taskItem"');
+				items.some((item) => item.task) || (token.raw || '').includes('data-type="taskItem"');
 
 			if (isTaskList) {
 				return `<ul data-type="taskList" class="contains-task-list" style="list-style: none; padding: 0; margin: 0; list-style-type: none !important; padding-left: 0 !important;">\n${bodyHtml}</ul>\n`;
@@ -115,7 +115,7 @@
 		? sanitizeHtml(contentWithEmbeds || '')
 		: sanitizeHtml(customMarked.parse(contentWithEmbeds || '', { breaks: true }) as string);
 
-	function enhanceProseContent(node: HTMLElement, _contentHtml: string) {
+	function enhanceProseContent(node: HTMLElement, _options?: unknown) {
 		const applyEnhancements = () => {
 			if (!node) return;
 			node.querySelectorAll('pre').forEach((pre) => {
@@ -239,34 +239,36 @@
 			class="prose text-base-content/70 mb-3 line-clamp-4 text-sm"
 			use:enhanceProseContent={processedContent}
 		>
+			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 			{@html renderedContent}
 		</div>
 		<div class="flex flex-wrap gap-1">
-			{#each note.tags as tag}
+			{#each note.tags as tag (tag)}
 				<span class="badge badge-sm badge-ghost">{tag}</span>
 			{/each}
 		</div>
-	</div>
-{:else}
-	<div
+		</div>
+		{:else}
+		<div
 		class="card bg-base-200 rounded-box max-h-64 min-h-48 cursor-pointer overflow-hidden p-4 shadow-md transition-shadow hover:shadow-lg"
 		onclick={handleClick}
 		role="button"
 		tabindex="0"
 		onkeydown={(e) => e.key === 'Enter' && handleClick()}
 		aria-label="メモを編集"
-	>
+		>
 		<h2 class="card-title mb-2 line-clamp-1 text-lg font-bold">{note.title}</h2>
 		<div
 			class="prose text-base-content/70 mb-3 line-clamp-4 text-sm"
 			use:enhanceProseContent={processedContent}
 		>
+			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 			{@html renderedContent}
 		</div>
 		<div class="flex flex-wrap gap-1">
-			{#each note.tags as tag}
+			{#each note.tags as tag (tag)}
 				<span class="badge badge-sm badge-ghost">{tag}</span>
 			{/each}
 		</div>
-	</div>
-{/if}
+		</div>
+		{/if}

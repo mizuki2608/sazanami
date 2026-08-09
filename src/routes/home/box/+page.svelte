@@ -14,7 +14,7 @@
 	let sortKey: SortKey = 'updatedAt_desc';
 	let isCreating = false;
 
-	$: allTags = (get(page).data.allTags || []) as string[];
+	$: allTags = ($page.data.allTags || []) as string[];
 
 	$: {
 		const notesStore = (get(page).data.notes || []) as Note[];

@@ -9,8 +9,6 @@
 	let { data }: { data: PageData } = $props();
 
 	let content = $state('');
-	let yjsUpdateBase64 = $state('');
-	let currentHtml = $state('');
 	let currentMd = $state('');
 	let title = $state('');
 	let saveTimeout: ReturnType<typeof setTimeout>;
@@ -34,7 +32,6 @@
 		}
 
 		content = data.note.content ?? '';
-		yjsUpdateBase64 = data.note.contentBin?.toString('base64') ?? '';
 		title = data.note.title ?? '';
 		titleError = '';
 		isMenuOpen = false;

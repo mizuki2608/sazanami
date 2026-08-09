@@ -1,9 +1,6 @@
 import { test as base, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
-const TEST_EMAIL = 'test@test.com';
-const TEST_PASSWORD = 'test0000';
-
 type Fixtures = {
 	authenticatedPage: Page;
 };

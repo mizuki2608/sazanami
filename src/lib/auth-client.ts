@@ -20,4 +20,20 @@ export const {
 	unlinkAccount
 } = authClient;
 
-export const emailPassword: any = authClient;
+type EmailPasswordClient = {
+	forgetPassword: (params: {
+		email: string;
+		redirectTo?: string;
+	}) => Promise<{ error: { message?: string } | null }>;
+	resetPassword: (params: {
+		newPassword: string;
+		token: string;
+		revokeOtherSessions?: boolean;
+	}) => Promise<{ error: { message?: string } | null }>;
+};
+
+// better-authの型定義にemailPasswordプロパティが含まれないため、
+// 明示的な型で公開する（実行時はauthClient.emailPasswordを参照）
+export const emailPassword: EmailPasswordClient = (
+	authClient as unknown as { emailPassword: EmailPasswordClient }
+).emailPassword;

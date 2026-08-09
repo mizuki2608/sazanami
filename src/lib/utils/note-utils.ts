@@ -59,7 +59,10 @@ export const extractWikiLinks = (content: string | null | undefined): string[] =
  * @param resolvedLinks 解決済みリンクのマップ (JSON文字列またはオブジェクト)
  * @returns 変換後のHTML文字列
  */
-export function renderWikiLinks(content: string | null | undefined, resolvedLinks: any): string {
+export function renderWikiLinks(
+	content: string | null | undefined,
+	resolvedLinks: string | Record<string, string> | null | undefined
+): string {
 	if (!content) return '';
 
 	let linksMap: Record<string, string> = {};

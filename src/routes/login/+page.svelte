@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { signIn, signUp, authClient } from '$lib/auth-client';
+	import { signIn, signUp, authClient, emailPassword } from '$lib/auth-client';
 	import { goto, invalidateAll } from '$app/navigation';
 
 	import { page } from '$app/state';
@@ -87,7 +87,7 @@
 					// ダミードメインの場合はメールが届かないため、自動でログインを試みる
 					if (targetEmail.endsWith('@sazanami.local')) {
 						console.log('Virtual domain registration, attempting auto login...');
-						const { data: signInData, error: signInError } = await signIn.email({
+						const { error: signInError } = await signIn.email({
 							email: targetEmail,
 							password,
 							callbackURL: '/home'
@@ -148,7 +148,7 @@
 		message = null;
 
 		try {
-			const { data, error: signInError } = await authClient.signIn.magicLink({
+			const { error: signInError } = await authClient.signIn.magicLink({
 				email,
 				name,
 				callbackURL: '/home',
@@ -210,7 +210,7 @@
 		message = null;
 
 		try {
-			const { error: forgotError } = await (authClient as any).emailPassword.forgetPassword({
+			const { error: forgotError } = await emailPassword.forgetPassword({
 				email,
 				redirectTo: '/reset-password'
 			});
@@ -236,7 +236,10 @@
 		message = null;
 
 		try {
-			const { data, error: signInError } = (await signIn.passkey()) as any;
+			const { data, error: signInError } = (await signIn.passkey()) as {
+				data?: { twoFactorRedirect?: boolean } | null;
+				error?: { message?: string } | null;
+			};
 			if (signInError) {
 				error =
 					typeof signInError === 'string'
@@ -270,7 +273,7 @@
 			const guestEmail = `${guestId}@sazanami.local`;
 
 			console.log('Registering guest user:', guestId);
-			const { data: signUpdata, error: signUpError } = await signUp.email({
+			const { error: signUpError } = await signUp.email({
 				name: `ゲスト (${guestId.slice(6, 12)})`,
 				email: guestEmail,
 				password: guestPassword,
@@ -282,7 +285,7 @@
 				error = signUpError.message || 'ゲストログインに失敗しました。';
 			} else {
 				console.log('Guest registration successful, signing in...');
-				const { data: signInData, error: signInError } = await signIn.email({
+				const { error: signInError } = await signIn.email({
 					email: guestEmail,
 					password: guestPassword,
 					callbackURL: '/home'

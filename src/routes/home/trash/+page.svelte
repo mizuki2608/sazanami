@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { PageData } from './$types';
 	import TimelinePost from '$lib/components/TimelinePost.svelte';
 	import type { Note } from '$lib/types';
 	import NoteModal from '$lib/components/NoteModal.svelte';

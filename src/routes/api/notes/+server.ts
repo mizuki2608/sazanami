@@ -2,7 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 
 import { db, updateNoteLinks } from '$lib/server/db';
 import { notes, tags, noteTags, timeline } from '$lib/server/db/schema';
-import { eq, or, like, desc, sql, and, ne } from 'drizzle-orm';
+import { eq, or, like, desc, sql, and } from 'drizzle-orm';
 import { ulid } from 'ulid';
 import { createAuth } from '$lib/server/auth';
 const auth = createAuth();

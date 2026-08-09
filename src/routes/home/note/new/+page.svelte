@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import TiptapEditor from '$lib/components/TiptapEditor.svelte';
@@ -9,7 +8,6 @@
 
 	let title = $state('');
 	let content = $state('');
-	let currentHtml = $state('');
 	let yjsUpdateBase64 = $state('');
 	let isPublic = $state(false);
 	let titleError = $state('');
@@ -26,7 +24,6 @@
 		yjsUpdateBase64: string;
 	}) => {
 		content = value.markdown;
-		currentHtml = value.html;
 		yjsUpdateBase64 = value.yjsUpdateBase64;
 	};
 
@@ -120,7 +117,7 @@
 
 					// Otherwise redirect to user's page
 					window.location.href = `/${userData.name}`;
-				} catch (jsonError) {
+				} catch {
 					console.log('Response was not JSON, redirecting to user page');
 					window.location.href = `/${userData.name}`;
 				}
