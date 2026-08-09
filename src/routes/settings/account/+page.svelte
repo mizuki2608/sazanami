@@ -151,7 +151,7 @@
 				totpURI = res.data.totpURI;
 				backupCodes = res.data.backupCodes || [];
 			} else if (res.error) {
-				twoFactorError = res.error.message;
+				twoFactorError = res.error.message ?? null;
 			}
 		} catch (e) {
 			console.error('Failed to enable 2FA:', e);
@@ -311,7 +311,7 @@
 	{/if}
 
 	<div class="mt-4">
-		{#if data.user.twoFactorEnabled}
+		{#if (data.user as { twoFactorEnabled?: boolean }).twoFactorEnabled}
 			<div class="flex items-center gap-4">
 				<span class="badge badge-success p-3">有効</span>
 				<button class="btn btn-error btn-outline btn-sm" onclick={disable2FA}>無効にする</button>
@@ -477,13 +477,15 @@
 
 		<div class="mt-4">
 			{#if data.hasPassword}
-				<div class="collapse collapse-arrow bg-base-200">
+				<div class="collapse-arrow bg-base-200 collapse">
 					<input type="checkbox" />
 					<div class="collapse-title text-sm font-medium">パスワードを変更する</div>
 					<div class="collapse-content">
 						<form method="POST" action="?/changePassword" class="space-y-4">
 							<div>
-								<label for="currentPassword" class="block text-sm font-medium">現在のパスワード</label>
+								<label for="currentPassword" class="block text-sm font-medium"
+									>現在のパスワード</label
+								>
 								<input
 									type="password"
 									id="currentPassword"

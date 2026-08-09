@@ -1,19 +1,33 @@
 import type { Note } from '$lib/types';
 import { generateSlug } from '$lib/utils/slug';
 
-export type SortKey = 'updatedAt_desc' | 'updatedAt_asc' | 'createdAt_desc' | 'createdAt_asc' | 'title_asc' | 'title_desc';
+export type SortKey =
+	| 'updatedAt_desc'
+	| 'updatedAt_asc'
+	| 'createdAt_desc'
+	| 'createdAt_asc'
+	| 'title_asc'
+	| 'title_desc';
 
 export function sortNotes(notes: Note[], sortKey: SortKey): Note[] {
 	const sorted = [...notes];
 	switch (sortKey) {
 		case 'updatedAt_desc':
-			return sorted.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+			return sorted.sort(
+				(a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+			);
 		case 'updatedAt_asc':
-			return sorted.sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime());
+			return sorted.sort(
+				(a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+			);
 		case 'createdAt_desc':
-			return sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+			return sorted.sort(
+				(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+			);
 		case 'createdAt_asc':
-			return sorted.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+			return sorted.sort(
+				(a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+			);
 		case 'title_asc':
 			return sorted.sort((a, b) => (a.title || '').localeCompare(b.title || '', 'ja'));
 		case 'title_desc':

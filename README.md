@@ -73,21 +73,25 @@ Hocuspocus を起動すると、複数ユーザーによるリアルタイム共
 ### セットアップ
 
 1.  **Hocuspocus サーバーをクローン**
+
     ```bash
     git clone <hocuspocus-repo-url> sazanami-hocuspocus
     cd sazanami-hocuspocus
     ```
 
 2.  **依存関係をインストールして起動**
+
     ```bash
     bun install
     bun run dev
     ```
+
     デフォルトでは `ws://localhost:1234` で起動します。
 
 3.  **Sazanami 側の環境変数（デフォルトのままなら不要）**
 
     `.env` に以下を追加：
+
     ```env
     PUBLIC_HOCUSPOCUS_URL=ws://localhost:1234
     ```
@@ -119,6 +123,7 @@ bun run test:e2e:debug
 ```
 
 **テスト対象機能**:
+
 - 認証（ログイン/登録）
 - ノート作成（タイムライン/Box）
 - ノート編集（テキスト入力、タスクリスト、フォーマット）

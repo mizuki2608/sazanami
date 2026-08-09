@@ -20,7 +20,11 @@
 	let urlStatus = $page.url.searchParams.get('status') || 'inbox';
 	let isBoxNote = urlStatus === 'box';
 
-	const handleContentChange = (value: { markdown: string; html: string; yjsUpdateBase64: string }) => {
+	const handleContentChange = (value: {
+		markdown: string;
+		html: string;
+		yjsUpdateBase64: string;
+	}) => {
 		content = value.markdown;
 		currentHtml = value.html;
 		yjsUpdateBase64 = value.yjsUpdateBase64;
@@ -58,11 +62,11 @@
 					});
 
 					if (response.status === 409) {
-						const err = await response.json();
+						const err = (await response.json()) as { message?: string };
 						titleError = err.message || '同じタイトルのノートが既に存在します';
 						isCreating = false;
 					} else if (response.ok) {
-						const newNote = await response.json();
+						const newNote = (await response.json()) as { id?: string };
 						// 作成成功したら、そのノートの編集ページにシームレスに遷移する
 						if (newNote && newNote.id) {
 							goto(`/home/note/${newNote.id}`, { replaceState: true });
@@ -105,7 +109,7 @@
 			} else if (response.ok) {
 				// If response is OK but not redirected, try to parse JSON
 				try {
-					const data = await response.json();
+					const data = (await response.json()) as { redirectTo?: string };
 					console.log('Form submission successful:', data);
 
 					// If we have a redirect URL in the response, use it

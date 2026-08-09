@@ -18,9 +18,12 @@ export const test = base.extend<Fixtures>({
 		await page.fill('input[name="email"]', 'e2e@test.com');
 		await page.fill('input[name="password"]', 'test0000');
 		await page.click('button[type="submit"]');
-		
-		const isHome = await page.waitForURL('/home', { timeout: 5000 }).then(() => true).catch(() => false);
-		
+
+		const isHome = await page
+			.waitForURL('/home', { timeout: 5000 })
+			.then(() => true)
+			.catch(() => false);
+
 		if (!isHome) {
 			await page.goto('/login?mode=register');
 			await page.waitForLoadState('networkidle');

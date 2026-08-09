@@ -38,7 +38,7 @@
 			{#each notes as note (note.id)}
 				<TimelinePost {note} mode="trash" on:edit={handleEdit} on:delete={() => invalidateAll()} />
 			{:else}
-				<p class="text-center text-base-content text-opacity-60">ゴミ箱は空です。</p>
+				<p class="text-base-content text-opacity-60 text-center">ゴミ箱は空です。</p>
 			{/each}
 		</div>
 	</div>

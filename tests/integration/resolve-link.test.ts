@@ -5,7 +5,8 @@ import { ulid } from 'ulid';
 import { db } from '$lib/server/db';
 import { notes, user } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
-import * as authModule from '$lib/server/auth';
+import * as authModuleSource from '$lib/server/auth';
+const authModule: any = authModuleSource;
 import { generateSlug } from '$lib/utils/slug';
 import type { RequestEvent } from '@sveltejs/kit';
 
@@ -92,7 +93,7 @@ describe('GET /api/notes/resolve-link', () => {
 					id: ulid(),
 					userId: testUserId,
 					title: 'Existing Note',
-					contentHtml: 'Content of existing note.',
+					content: 'Content of existing note.',
 					isPublic: false,
 					createdAt: new Date(2023, 0, 1, 10, 0, 0),
 					updatedAt: new Date(2023, 0, 1, 10, 0, 0),
@@ -102,7 +103,7 @@ describe('GET /api/notes/resolve-link', () => {
 					id: ulid(),
 					userId: testUserId,
 					title: 'Another Note',
-					contentHtml: 'Content of another note.',
+					content: 'Content of another note.',
 					isPublic: false,
 					createdAt: new Date(2023, 0, 2, 10, 0, 0),
 					updatedAt: new Date(2023, 0, 2, 10, 0, 0),
@@ -112,7 +113,7 @@ describe('GET /api/notes/resolve-link', () => {
 					id: ulid(),
 					userId: testUserId,
 					title: 'Test Note for Duplicates A',
-					contentHtml: 'Content A.',
+					content: 'Content A.',
 					isPublic: false,
 					createdAt: new Date(2023, 0, 3, 10, 0, 0),
 					updatedAt: new Date(2023, 0, 3, 10, 0, 0),
@@ -122,7 +123,7 @@ describe('GET /api/notes/resolve-link', () => {
 					id: ulid(),
 					userId: testUserId,
 					title: 'Test Note for Duplicates B',
-					contentHtml: 'Content B.',
+					content: 'Content B.',
 					isPublic: false,
 					createdAt: new Date(2023, 0, 4, 10, 0, 0),
 					updatedAt: new Date(2023, 0, 4, 10, 0, 0),
@@ -132,7 +133,7 @@ describe('GET /api/notes/resolve-link', () => {
 					id: ulid(),
 					userId: testUserId,
 					title: 'Test Note for Duplicates C',
-					contentHtml: 'Content C.',
+					content: 'Content C.',
 					isPublic: false,
 					createdAt: new Date(2023, 0, 5, 10, 0, 0),
 					updatedAt: new Date(2023, 0, 5, 10, 0, 0),
@@ -231,7 +232,7 @@ describe('GET /api/notes/resolve-link', () => {
 				id: japaneseNoteId,
 				userId: testUserId,
 				title: japaneseTitle,
-				contentHtml: '日本語のコンテンツ',
+				content: '日本語のコンテンツ',
 				isPublic: false,
 				createdAt: new Date(),
 				updatedAt: new Date(),

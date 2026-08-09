@@ -34,7 +34,7 @@
 		}
 
 		content = data.note.content ?? '';
-		yjsUpdateBase64 = data.note.contentBin ?? '';
+		yjsUpdateBase64 = data.note.contentBin?.toString('base64') ?? '';
 		title = data.note.title ?? '';
 		titleError = '';
 		isMenuOpen = false;
@@ -47,13 +47,15 @@
 	});
 
 	function normalizeMarkdownForClipboard(markdown: string) {
-		return markdown
-			// Convert non-breaking spaces to normal spaces first.
-			.replace(/\u00a0/g, ' ')
-			// Remove standalone "&nbsp;" lines often produced by pasted rich text.
-			.replace(/^[ \t]*&nbsp;[ \t]*$/gm, '')
-			// Replace remaining HTML entity spaces with regular spaces.
-			.replace(/&nbsp;/g, ' ');
+		return (
+			markdown
+				// Convert non-breaking spaces to normal spaces first.
+				.replace(/\u00a0/g, ' ')
+				// Remove standalone "&nbsp;" lines often produced by pasted rich text.
+				.replace(/^[ \t]*&nbsp;[ \t]*$/gm, '')
+				// Replace remaining HTML entity spaces with regular spaces.
+				.replace(/&nbsp;/g, ' ')
+		);
 	}
 
 	async function expandEmbedsInMarkdown(markdown: string) {
@@ -66,7 +68,7 @@
 			try {
 				const res = await fetch(`/api/notes/embed?title=${encodeURIComponent(embedTitle)}`);
 				if (res.ok) {
-					const data = await res.json();
+					const data = (await res.json()) as { content?: string };
 					const text = (data.content || '').trim();
 					expandedMarkdown = expandedMarkdown.replace(match[0], text);
 				}
@@ -123,11 +125,14 @@
 				});
 
 				if (response.status === 409) {
-					const err = await response.json();
+					const err = (await response.json()) as { message?: string };
 					titleError = err.message || '同じタイトルのノートが既に存在します';
 				} else if (response.ok) {
 					titleError = '';
-					const updatedNote = await response.json();
+					const updatedNote = (await response.json()) as {
+						title?: string;
+						content?: string;
+					};
 					lastSavedTitle = updatedNote.title ?? title;
 					lastSavedContent = updatedNote.content ?? content;
 					// タイトル、更新日時だけでなく、resolvedLinksなども含めて更新する
@@ -181,7 +186,7 @@
 			});
 
 			if (!response.ok) {
-				const error = await response.json();
+				const error = (await response.json()) as { message?: string };
 				console.error('Failed to update note status:', error);
 				throw new Error(error.message || 'Failed to update note status');
 			}
@@ -237,18 +242,14 @@
 			</svg>
 			{copySuccess ? 'コピーしました！' : 'Markdownコピー'}
 		</button>
-		
+
 		<!-- 三点リーダーメニュー -->
 		<div class="dropdown dropdown-end">
-			<button
-				class="btn btn-ghost btn-sm"
-				onclick={() => (isMenuOpen = !isMenuOpen)}
-				type="button"
-			>
+			<button class="btn btn-ghost btn-sm" onclick={() => (isMenuOpen = !isMenuOpen)} type="button">
 				⋮
 			</button>
 			{#if isMenuOpen}
-				<ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+				<ul class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
 					<li>
 						<button
 							onclick={async () => {

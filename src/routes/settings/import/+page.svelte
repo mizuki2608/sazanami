@@ -80,7 +80,12 @@
 				body: formData
 			});
 
-			const data = await response.json();
+			const data = (await response.json()) as {
+				importedCount: number;
+				skippedCount?: number;
+				errors?: string[];
+				message?: string;
+			};
 
 			if (response.ok) {
 				result = {
@@ -128,11 +133,11 @@
 	</div>
 
 	<!-- インポート手順 -->
-	<div class="collapse collapse-arrow bg-base-200 rounded-box">
+	<div class="collapse-arrow bg-base-200 rounded-box collapse">
 		<input type="checkbox" />
 		<div class="collapse-title font-medium">Obsidianからのエクスポート手順</div>
 		<div class="collapse-content space-y-1 text-sm">
-			<ol class="list-decimal list-inside space-y-1">
+			<ol class="list-inside list-decimal space-y-1">
 				<li>ObsidianのVaultフォルダを開く</li>
 				<li>フォルダ全体（または必要なフォルダ）を選択してZIPに圧縮</li>
 				<li>できあがったZIPファイルをここにドロップするかファイル選択してインポート</li>

@@ -125,7 +125,15 @@ export const POST: RequestHandler = async ({ request }) => {
 			tags: tagNames,
 			skipTimeline,
 			status
-		} = body as { id?: string; title?: string; content?: string; contentBin?: string; tags?: string[]; skipTimeline?: boolean; status?: string };
+		} = body as {
+			id?: string;
+			title?: string;
+			content?: string;
+			contentBin?: string;
+			tags?: string[];
+			skipTimeline?: boolean;
+			status?: string;
+		};
 
 		// IDのバリデーション
 		let noteId: string;

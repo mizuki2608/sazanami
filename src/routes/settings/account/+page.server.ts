@@ -38,7 +38,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			await auth.api.forgetPassword({
+			await (auth.api as any).forgetPassword({
 				body: {
 					email: sessionData.user.email,
 					redirectTo: '/reset-password'
@@ -90,7 +90,7 @@ export const actions: Actions = {
 		} catch (e: any) {
 			if (e instanceof APIError) {
 				return fail(e.statusCode, {
-					message: e.body.message
+					message: e.body?.message
 				});
 			}
 			return fail(500, {

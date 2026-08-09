@@ -73,7 +73,11 @@
 	customMarked.use({ gfm: true, renderer });
 
 	function escapeMarkdownText(value: string) {
-		return value.replace(/\\/g, '\\\\').replace(/\]/g, '\\]').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+		return value
+			.replace(/\\/g, '\\\\')
+			.replace(/\]/g, '\\]')
+			.replace(/\(/g, '\\(')
+			.replace(/\)/g, '\\)');
 	}
 
 	function protectNoteEmbeds(content: string) {
@@ -195,7 +199,7 @@
 				fetch(`/api/notes/embed?title=${encodeURIComponent(title)}`)
 					.then((res) => {
 						if (!res.ok) throw new Error('Not found');
-						return res.json();
+						return res.json() as Promise<{ content?: string }>;
 					})
 					.then((data) => {
 						const parsed = customMarked.parse(data.content || '', { breaks: true }) as string;

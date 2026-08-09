@@ -59,7 +59,7 @@
 				if (apiError) {
 					console.error('Login error:', apiError);
 					error = apiError.message || 'ログインに失敗しました。';
-				} else if (data?.twoFactorRedirect) {
+				} else if ((data as { twoFactorRedirect?: boolean }).twoFactorRedirect) {
 					console.log('2FA required, redirecting to two-factor page');
 					await goto(
 						'/login/two-factor' + (queryParams.toString() ? '?' + queryParams.toString() : '')
@@ -103,7 +103,8 @@
 							await goto('/home');
 						}
 					} else {
-						message = '確認用メールを送信しました。メールのリンクをクリックし登録を完了してください。';
+						message =
+							'確認用メールを送信しました。メールのリンクをクリックし登録を完了してください。';
 						mode = 'login';
 					}
 				}
@@ -184,7 +185,7 @@
 			if (signInError) {
 				console.error('Signin error:', signInError);
 				error = signInError.message || 'ログイン出来ませんでした。';
-			} else if (data?.twoFactorRedirect) {
+			} else if ((data as { twoFactorRedirect?: boolean }).twoFactorRedirect) {
 				await goto(
 					'/login/two-factor' + (queryParams.toString() ? '?' + queryParams.toString() : '')
 				);
@@ -209,7 +210,7 @@
 		message = null;
 
 		try {
-			const { error: forgotError } = await authClient.emailPassword.forgetPassword({
+			const { error: forgotError } = await (authClient as any).emailPassword.forgetPassword({
 				email,
 				redirectTo: '/reset-password'
 			});
@@ -370,14 +371,14 @@
 				<div class="card-actions mt-4">
 					<button
 						type="button"
-						class="btn btn-secondary w-full font-bold btn-outline"
+						class="btn btn-secondary btn-outline w-full font-bold"
 						disabled={isLoading}
 						onclick={startAsGuest}
 					>
 						アカウント不要で始める (ゲスト)
 					</button>
 				</div>
-				
+
 				<div class="card-actions mt-4">
 					<button
 						type="button"
@@ -392,7 +393,7 @@
 				<div class="card-actions mt-4">
 					<button
 						type="button"
-						class="btn btn-secondary w-full font-bold btn-outline"
+						class="btn btn-secondary btn-outline w-full font-bold"
 						disabled={isLoading}
 						onclick={startAsGuest}
 					>
@@ -426,7 +427,7 @@
 			<div class="card-actions mt-4">
 				<button
 					type="button"
-					class="btn w-full font-bold btn-neutral"
+					class="btn btn-neutral w-full font-bold"
 					disabled={isLoading}
 					onclick={() => (showPasswordModal = true)}
 				>
@@ -486,7 +487,9 @@
 			<form onsubmit={handleSubmit}>
 				{#if mode === 'register'}
 					<div class="form-control mb-4">
-						<label class="label" for="name"><span class="label-text">表示名（省略時はIDと同じ）</span></label>
+						<label class="label" for="name"
+							><span class="label-text">表示名（省略時はIDと同じ）</span></label
+						>
 						<input
 							id="name"
 							name="name"
@@ -499,7 +502,9 @@
 					</div>
 				{/if}
 				<div class="form-control mb-4">
-					<label class="label" for="email"><span class="label-text">ユーザーID または メールアドレス</span></label>
+					<label class="label" for="email"
+						><span class="label-text">ユーザーID または メールアドレス</span></label
+					>
 					<input
 						id="email"
 						name="email"

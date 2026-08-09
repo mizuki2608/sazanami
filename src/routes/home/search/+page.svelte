@@ -67,14 +67,14 @@
 
 		<div class="flex flex-col space-y-4">
 			{#if !hasQuery}
-				<p class="text-base-content text-center text-opacity-60">
+				<p class="text-base-content text-opacity-60 text-center">
 					ヘッダーの検索バーからキーワードを入力すると結果が表示されます。
 				</p>
 			{:else}
 				{#each notes as note (note.id)}
 					<TimelinePost {note} on:edit={handleEdit} />
 				{:else}
-					<p class="text-base-content text-center text-opacity-60">
+					<p class="text-base-content text-opacity-60 text-center">
 						一致するメモは見つかりませんでした。
 					</p>
 				{/each}

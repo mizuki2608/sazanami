@@ -10,7 +10,7 @@ import { getStorageDriver } from '$lib/server/storage';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const identifier = params.username;
-	const sessionUser = locals.session?.user;
+	const sessionUser = locals.user;
 
 	if (!sessionUser) {
 		throw redirect(302, '/login');
@@ -46,7 +46,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 export const actions: Actions = {
 	default: async (event) => {
-		const sessionUser = event.locals.session?.user;
+		const sessionUser = event.locals.user;
 		if (!sessionUser) {
 			throw error(401, 'Unauthorized');
 		}

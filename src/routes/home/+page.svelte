@@ -38,7 +38,7 @@
 			{#each notes as note (note.id)}
 				<TimelinePost {note} on:edit={handleEdit} />
 			{:else}
-				<p class="text-center text-base-content text-opacity-60">
+				<p class="text-base-content text-opacity-60 text-center">
 					タイムラインにはまだ何もありません。
 				</p>
 			{/each}

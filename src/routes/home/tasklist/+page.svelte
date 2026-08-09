@@ -60,7 +60,7 @@
 			{#each incompleteNotes as note (note.id)}
 				<TimelinePost {note} on:edit={handleEdit} />
 			{:else}
-				<p class="text-center text-base-content text-opacity-60 py-4">
+				<p class="text-base-content text-opacity-60 py-4 text-center">
 					未完了のタスクがあるノートはありません。
 				</p>
 			{/each}

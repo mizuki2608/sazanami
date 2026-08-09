@@ -3,7 +3,8 @@ import { ulid } from 'ulid';
 import { db } from '$lib/server/db';
 import { attachments, user as userSchema } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
-import * as authModule from '$lib/server/auth';
+import * as authModuleSource from '$lib/server/auth';
+const authModule: any = authModuleSource;
 import type { RequestEvent } from '@sveltejs/kit';
 import type { User, Session } from 'better-auth';
 import { POST } from '../../src/routes/api/attachments/+server';
@@ -88,8 +89,8 @@ describe('POST /api/attachments', () => {
 		vi.spyOn(authModule.auth.api, 'getSession').mockResolvedValue(mockSession);
 
 		// 4. Call the endpoint handler
-		const response = await POST(event);
-		const body = await response.json();
+		const response = await POST(event as any);
+		const body = (await response.json()) as { success: boolean; url: string };
 
 		// 5. Assert response
 		expect(response.status).toBe(201);
@@ -122,7 +123,7 @@ describe('POST /api/attachments', () => {
 		const request = new Request('http://localhost/api/attachments', { method: 'POST' });
 		const event = { request } as unknown as RequestEvent;
 
-		const response = await POST(event);
+		const response = await POST(event as any);
 		expect(response.status).toBe(401);
 	});
 });

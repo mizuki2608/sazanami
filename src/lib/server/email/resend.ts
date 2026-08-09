@@ -1,6 +1,8 @@
 import type { EmailDriver } from './types';
 
-export async function createResendDriver(env: Record<string, string | undefined>): Promise<EmailDriver | null> {
+export async function createResendDriver(
+	env: Record<string, string | undefined>
+): Promise<EmailDriver | null> {
 	const apiKey = env.RESEND_API_KEY;
 	const fromEmail = env.RESEND_FROM_EMAIL || env.SMTP_FROM;
 

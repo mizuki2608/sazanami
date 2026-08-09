@@ -65,7 +65,7 @@
 		try {
 			const res = await fetch(`/api/notes/${id}`);
 			if (res.ok) {
-				const note = await res.json();
+				const note = (await res.json()) as { title?: string; content?: string };
 				title = note.title || '';
 				content = note.content || '';
 				showTitleInput = !!note.title;

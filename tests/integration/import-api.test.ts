@@ -3,7 +3,8 @@ import { ulid } from 'ulid';
 import { db } from '$lib/server/db';
 import { notes, noteLinks, user as userSchema } from '$lib/server/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
-import * as authModule from '$lib/server/auth';
+import * as authModuleSource from '$lib/server/auth';
+const authModule: any = authModuleSource;
 import type { RequestEvent } from '@sveltejs/kit';
 import type { User, Session } from 'better-auth';
 import { POST } from '../../src/routes/api/notes/import/+server';
@@ -76,8 +77,8 @@ describe('POST /api/notes/import', () => {
 		vi.spyOn(authModule.auth.api, 'getSession').mockResolvedValue(mockSession);
 
 		// 4. Call the endpoint handler
-		const response = await POST(event);
-		const body = await response.json();
+		const response = await POST(event as any);
+		const body = (await response.json()) as { success: boolean; importedCount: number };
 
 		// 5. Assert response
 		expect(response.status).toBe(201);
@@ -93,8 +94,8 @@ describe('POST /api/notes/import', () => {
 
 		expect(note1).toBeDefined();
 		expect(note2).toBeDefined();
-		expect(note1?.contentHtml).toBe(file1Content);
-		expect(note2?.contentHtml).toBe(file2Content);
+		expect(note1?.content).toBe(file1Content);
+		expect(note2?.content).toBe(file2Content);
 
 		// 7. Verify link was created in DB
 		if (!note1 || !note2) {

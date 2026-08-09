@@ -3,7 +3,8 @@ import { ulid } from 'ulid';
 import { db } from '$lib/server/db';
 import { notes, user } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
-import * as authModule from '$lib/server/auth';
+import * as authModuleSource from '$lib/server/auth';
+const authModule: any = authModuleSource;
 import { generateSlug } from '$lib/utils/slug';
 import type { RequestHandler, RequestEvent } from '@sveltejs/kit';
 import { POST as createNote, GET as getNotes } from '../../src/routes/api/notes/+server';
@@ -77,7 +78,7 @@ interface NoteResponse {
 	id: string;
 	userId: string;
 	title: string;
-	contentHtml: string;
+	content: string;
 	createdAt: string;
 	updatedAt: string;
 	isPublic: boolean;
@@ -118,7 +119,7 @@ describe('POST /api/notes', () => {
 			'http://localhost/api/notes',
 			'POST',
 			null,
-			{ title: 'Test', contentHtml: 'Test' }
+			{ title: 'Test', content: 'Test' }
 		);
 		const response = await createNote(params);
 		expect(response.status).toBe(401);
@@ -163,7 +164,7 @@ describe('POST /api/notes', () => {
 			'http://localhost/api/notes',
 			'POST',
 			mockSession,
-			{ title: noteTitle, contentHtml: 'Some content' }
+			{ title: noteTitle, content: 'Some content' }
 		);
 		const response = await createNote(params);
 		expect(response.status).toBe(201);
@@ -188,7 +189,7 @@ describe('POST /api/notes', () => {
 			'http://localhost/api/notes',
 			'POST',
 			mockSession,
-			{ title: noteTitle, contentHtml: 'Some content in Japanese' }
+			{ title: noteTitle, content: 'Some content in Japanese' }
 		);
 		const response = await createNote(params);
 		expect(response.status).toBe(201);
@@ -236,7 +237,7 @@ describe('PUT /api/notes/{id}', () => {
 			id: existingNoteId,
 			userId: testUserId,
 			title: initialTitle,
-			contentHtml: 'Original content',
+			content: 'Original content',
 			isPublic: false,
 			createdAt: new Date(),
 			updatedAt: new Date(),
@@ -299,7 +300,7 @@ describe('PUT /api/notes/{id}', () => {
 			`http://localhost/api/notes/${existingNoteId}`,
 			'PUT',
 			mockSession,
-			{ title: updatedTitle, contentHtml: 'Updated content' },
+			{ title: updatedTitle, content: 'Updated content' },
 			{ id: existingNoteId }
 		);
 		const response = await updateNote(params);
@@ -325,7 +326,7 @@ describe('PUT /api/notes/{id}', () => {
 			`http://localhost/api/notes/${existingNoteId}`,
 			'PUT',
 			mockSession,
-			{ title: updatedTitle, contentHtml: 'Updated content in Japanese' },
+			{ title: updatedTitle, content: 'Updated content in Japanese' },
 			{ id: existingNoteId }
 		);
 		const response = await updateNote(params);

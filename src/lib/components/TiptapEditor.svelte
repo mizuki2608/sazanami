@@ -16,12 +16,12 @@
 	import { WikiLinkMark } from './extensions/WikiLinkMark';
 	import { NoteEmbedNode } from './extensions/NoteEmbedNode';
 	import * as Y from 'yjs';
-import { IndexeddbPersistence } from 'y-indexeddb';
-import { HocuspocusProvider } from '@hocuspocus/provider';
-import Collaboration from '@tiptap/extension-collaboration';
-import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
-import { Markdown } from '@tiptap/markdown';
-import { goto } from '$app/navigation';
+	import { IndexeddbPersistence } from 'y-indexeddb';
+	import { HocuspocusProvider } from '@hocuspocus/provider';
+	import Collaboration from '@tiptap/extension-collaboration';
+	import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
+	import { Markdown } from '@tiptap/markdown';
+	import { goto } from '$app/navigation';
 
 	const lowlight = createLowlight(all);
 
@@ -265,10 +265,10 @@ import { goto } from '$app/navigation';
 			// If we have initial binary content from server, apply it
 			if (initialContentBinBase64) {
 				try {
-					const uint8Array = Uint8Array.from(atob(initialContentBinBase64), c => c.charCodeAt(0));
+					const uint8Array = Uint8Array.from(atob(initialContentBinBase64), (c) => c.charCodeAt(0));
 					Y.applyUpdate(ydoc, uint8Array);
-				} catch(e) {
-					console.error("Failed to parse initial Yjs update", e);
+				} catch (e) {
+					console.error('Failed to parse initial Yjs update', e);
 				}
 			}
 
@@ -283,7 +283,7 @@ import { goto } from '$app/navigation';
 				hocuspocusProvider = new HocuspocusProvider({
 					url: import.meta.env.PUBLIC_HOCUSPOCUS_URL || 'ws://localhost:1234',
 					name: noteId,
-					document: ydoc,
+					document: ydoc
 				});
 			}
 
@@ -292,10 +292,10 @@ import { goto } from '$app/navigation';
 				StarterKit.configure({
 					codeBlock: false,
 					link: false,
-					history: false // disable history because of Collaboration extension
+					undoRedo: false // disable history because of Collaboration extension
 				}),
 				Collaboration.configure({
-					document: ydoc,
+					document: ydoc
 				}),
 				Placeholder.configure({
 					placeholder: placeholder
@@ -325,9 +325,13 @@ import { goto } from '$app/navigation';
 
 			// Only add cursor awareness when Hocuspocus is connected
 			if (hocuspocusProvider) {
-				extensions.splice(2, 0, CollaborationCursor.configure({
-					provider: hocuspocusProvider,
-				}));
+				extensions.splice(
+					2,
+					0,
+					CollaborationCursor.configure({
+						provider: hocuspocusProvider
+					})
+				);
 			}
 
 			editor = new Editor({
@@ -355,7 +359,7 @@ import { goto } from '$app/navigation';
 								if (title) {
 									fetch(`/api/notes/embed?title=${encodeURIComponent(title)}`)
 										.then((res) => {
-											if (res.ok) return res.json();
+											if (res.ok) return res.json() as Promise<{ id?: string }>;
 											throw new Error('Not found');
 										})
 										.then((data) => {
@@ -538,9 +542,7 @@ import { goto } from '$app/navigation';
 				{/if}
 			</button>
 
-			<span class="text-base-content/40 text-xs">
-				画像のペースト・ドロップも対応
-			</span>
+			<span class="text-base-content/40 text-xs"> 画像のペースト・ドロップも対応 </span>
 		</div>
 		<!-- ファイル選択（非表示） -->
 		<input
