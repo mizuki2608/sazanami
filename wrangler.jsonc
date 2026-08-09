@@ -4,7 +4,8 @@
 	"compatibility_date": "2025-05-12",
 	"vars": {
 		"STORAGE_DRIVER": "local",
-		"BETTER_AUTH_URL": "https://sazanami.mizuki-sazanami.workers.dev"
+		"BETTER_AUTH_URL": "https://sazanami.mizuki-sazanami.workers.dev",
+		"EMAIL_DRIVER": "plunk"
 	},
 	"compatibility_flags": ["nodejs_compat"],
 	"assets": {
