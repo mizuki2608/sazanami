@@ -2,6 +2,7 @@ import { env } from '$env/dynamic/private';
 import { escapeHtml } from '../../utils/sanitize';
 import type { EmailDriver } from './types';
 import { createResendDriver } from './resend';
+import { createPlunkDriver } from './plunk';
 import { createCloudflareDriver } from './cloudflare';
 
 // ---------------------------------------------------------------------------
@@ -43,6 +44,10 @@ async function getEmailDriver(): Promise<EmailDriver> {
 				const driver = await createSmtpDriver(envRecord);
 				if (driver) return driver;
 			}
+		}
+		if (driverName === 'plunk' || driverName === 'auto') {
+			const driver = await createPlunkDriver(envRecord);
+			if (driver) return driver;
 		}
 		if (driverName === 'resend' || driverName === 'auto') {
 			const driver = await createResendDriver(envRecord);
