@@ -12,7 +12,7 @@ export async function createPlunkDriver(
 ): Promise<EmailDriver | null> {
 	const apiKey = env.PLUNK_API_KEY;
 	const fromEmail = env.PLUNK_FROM_EMAIL || env.SMTP_FROM;
-	const apiUrl = (env.PLUNK_API_URL || 'https://api.useplunk.com').replace(/\/$/, '');
+	const apiUrl = (env.PLUNK_API_URL || 'https://next-api.useplunk.com').replace(/\/$/, '');
 
 	if (!apiKey || !fromEmail) return null;
 
@@ -38,8 +38,10 @@ export async function createPlunkDriver(
 				throw new Error(`Plunk error (${response.status}): ${errorBody}`);
 			}
 
-			const data = (await response.json()) as { email?: { id?: string } };
-			return { messageId: data?.email?.id || 'unknown' };
+			const data = (await response.json()) as {
+				data?: { emails?: Array<{ email?: string }> };
+			};
+			return { messageId: data?.data?.emails?.[0]?.email || 'unknown' };
 		}
 	};
 }
