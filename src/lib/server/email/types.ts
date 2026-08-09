@@ -12,4 +12,4 @@ export interface EmailDriver {
 	}): Promise<{ messageId: string }>;
 }
 
-export type EmailDriverName = 'smtp' | 'plunk' | 'resend' | 'cloudflare' | 'noop';
+export type EmailDriverName = 'smtp' | 'plunk' | 'cloudflare' | 'noop';

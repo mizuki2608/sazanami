@@ -220,7 +220,7 @@ let driverPromise: Promise<StorageDriver> | null = null;
 export async function getStorageDriver(r2Bucket?: R2Bucket): Promise<StorageDriver> {
 	if (driverPromise) return driverPromise;
 
-	const driverName = (env.STORAGE_DRIVER ?? 'local').toLowerCase();
+	const driverName = (env.STORAGE_DRIVER ?? 's3').toLowerCase();
 
 	if (driverName === 'r2' && r2Bucket) {
 		driverPromise = Promise.resolve(
@@ -240,5 +240,5 @@ export async function getStorageDriver(r2Bucket?: R2Bucket): Promise<StorageDriv
 
 /** Check if STORAGE_DRIVER is set to 'r2' */
 export function isR2Configured(): boolean {
-	return (env.STORAGE_DRIVER ?? 'local').toLowerCase() === 'r2';
+	return (env.STORAGE_DRIVER ?? 's3').toLowerCase() === 'r2';
 }
