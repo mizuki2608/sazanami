@@ -2,12 +2,24 @@ import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { ulid } from 'ulid';
 import { db } from '$lib/server/db';
 import { notes, noteLinks, user as userSchema } from '$lib/server/db/schema';
-import { eq, and, sql } from 'drizzle-orm';
-import * as authModuleSource from '$lib/server/auth';
-const authModule: any = authModuleSource;
+import { eq, sql } from 'drizzle-orm';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { User, Session } from 'better-auth';
 import { POST } from '../../src/routes/api/notes/import/+server';
+
+// Mock the auth module: routes call createAuth() at module load time and use
+// auth.api.getSession({ headers }) to authenticate.
+const { mockAuth } = vi.hoisted(() => ({
+	mockAuth: {
+		api: {
+			getSession: vi.fn()
+		}
+	}
+}));
+
+vi.mock('$lib/server/auth', () => ({
+	createAuth: vi.fn(() => mockAuth)
+}));
 
 // Mock user and session
 const testUser = {
@@ -74,10 +86,10 @@ describe('POST /api/notes/import', () => {
 			locals: { user: mockSession.user, session: mockSession.session }
 		} as unknown as RequestEvent;
 
-		vi.spyOn(authModule.auth.api, 'getSession').mockResolvedValue(mockSession);
+		mockAuth.api.getSession.mockResolvedValue(mockSession);
 
 		// 4. Call the endpoint handler
-		const response = await POST(event as any);
+		const response = await POST(event as Parameters<typeof POST>[0]);
 		const body = (await response.json()) as { success: boolean; importedCount: number };
 
 		// 5. Assert response

@@ -23,9 +23,12 @@ afterAll(async () => {
 
 // Mock location for better-auth client in Node environment
 if (typeof window === 'undefined') {
-	(global as any).window = {
-		location: {
-			origin: 'http://localhost:12000'
-		}
-	};
+	Object.defineProperty(globalThis, 'window', {
+		value: {
+			location: {
+				origin: 'http://localhost:12000'
+			}
+		},
+		configurable: true
+	});
 }
